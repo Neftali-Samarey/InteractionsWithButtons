@@ -10,75 +10,87 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    // buttons
-    let first_button : UIButton = {
-        let button = UIButton(type: .custom)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Button 1", for: .normal)
-        button.addTarget(self, action: #selector(ViewController.firstButtonAction), for: .touchUpInside)
-        return button
+    let mainLabel : UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 36.0, weight: .bold)
+        label.textAlignment = .center
+        label.textColor = .white
+        label.text = "?"
+        return label
     }()
     
-    let second_button : UIButton = {
-        let button = UIButton(type: .custom)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Button 2", for: .normal)
-        button.addTarget(self, action: #selector(ViewController.secondButtonAction), for: .touchUpInside)
-        return button
+    let dashboardView : Dashboard = {
+        
+        let dashboard = Dashboard()
+        dashboard.translatesAutoresizingMaskIntoConstraints = false
+        dashboard.layer.backgroundColor = UIColor.black.cgColor
+        dashboard.alpha = 0.8
+        dashboard.layer.cornerRadius = 15
+        return dashboard
     }()
-    
-    let third_button : UIButton = {
-        let button = UIButton(type: .custom)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Button 3", for: .normal)
-        button.addTarget(self, action: #selector(ViewController.thirdButtonAction), for: .touchUpInside)
-        return button
-    }()
-    
-    lazy var verticalStack : UIStackView = {
-        let vstack = UIStackView()
-        vstack.translatesAutoresizingMaskIntoConstraints = false
-        vstack.axis = .vertical
-        vstack.distribution = .fillEqually
-        vstack.spacing = 5
-        return vstack
-    }()
+   
 
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         view.backgroundColor = UIColor.systemTeal
+        
+        dashboardView.delegate = self
+        
         // Do any additional setup after loading the view.
-        verticalStack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(verticalStack)
+        view.addSubview(mainLabel)
+        view.addSubview(dashboardView)
+        dashboardView.heightAnchor.constraint(equalToConstant: 120).isActive = true
+        dashboardView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15).isActive = true
+        dashboardView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15).isActive = true
+        dashboardView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -45).isActive = true
         
-        verticalStack.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
-        verticalStack.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-        verticalStack.heightAnchor.constraint(equalToConstant: view.frame.height/2).isActive = true
-        verticalStack.widthAnchor.constraint(equalToConstant: view.frame.width - 20).isActive = true
+        mainLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
+        mainLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
+        mainLabel.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        mainLabel.widthAnchor.constraint(equalToConstant: view.frame.width).isActive = true
         
-
-        verticalStack.addArrangedSubview(first_button)
-        verticalStack.addArrangedSubview(second_button)
-        verticalStack.addArrangedSubview(third_button)
-        
-    }
-
-    // MARK: - Actions
-    @objc func firstButtonAction() {
-        print("Selected 1st")
     }
     
-    @objc func secondButtonAction() {
-        print("Selected 2nd")
-    }
-    
-    @objc func thirdButtonAction() {
-        print("Selected 3rd")
+    // MARK: - Methods
+    internal func animateWith(text: String) {
+        self.mainLabel.fadeTransition(0.2)
+        self.mainLabel.text = text
     }
 
 }
 
+extension ViewController: GetSelectedItemDelegate {
+    func selectedItem(itemSelection: ItemSelection) {
+        switch itemSelection {
+        case .Fries:
+            animateWith(text: "Fries again?")
+        case .Burger:
+            animateWith(text: "Thats for the summer!")
+        case .Pizza:
+            animateWith(text: "Meehh, pizza?")
+        default:
+            print("None selected")
+        }
+    }
+
+}
+
+
+
 extension UIView {
+    
+  func fadeTransition(_ duration:CFTimeInterval) {
+        let animation = CATransition()
+        animation.timingFunction = CAMediaTimingFunction(name:
+            CAMediaTimingFunctionName.easeInEaseOut)
+        animation.type = CATransitionType.fade
+        animation.duration = duration
+        layer.add(animation, forKey: CATransitionType.fade.rawValue)
+    }
+    
+    
   func height(constant: CGFloat) {
     setConstraint(value: constant, attribute: .height)
   }
